@@ -2,7 +2,7 @@
 import java.net.*;
 import java.io.*;
 
-pulic class Server {
+public class Server extends Thread {
 private ServerSocket serverSocket;
 private void newServerSocket(int port) throws IOException {
     // [1]: Create a new ServerSocket object
@@ -17,7 +17,7 @@ private void newServerSocket(int port) throws IOException {
     System.out.println("Server started on port " + port);
     }
 
-private void waitForConnection() throws IOException {
+private Socket waitForConnection() throws IOException {
     // [1]: Wait for a client to connect to the server
     // [2]: When a client connects, the server will return a new Socket object
     // [3]: Same question for exception handling
@@ -39,8 +39,8 @@ private void closeConnection(Socket socket) {
  * 1. The server will wait for a client to connect
  * 2. When a client connects, the server will create a new thread to handle the connection
  * 3. The server will wait for the client to send a message
- * 4. If the client sends a message, the server will send a message back to the client
- * 5. If client sends a empty message, the server will close the connection
+ * 4. If the client sends a message, the server will list all files in path informed
+ * 5. If client sends a invalid path, the server will close the connection and return -1
  */
 
 private void ConexionHandler(Socket socket){    // Handling  the conexion for each protocol
@@ -56,21 +56,35 @@ private void ConexionHandler(Socket socket){    // Handling  the conexion for ea
     try {
         ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
         ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
-        output.writeUTF("SRV: Hello from the server"); // write the object to the output stream
+        output.writeUTF("SRV: Connection successful"); // write the object to the output stream
 
-        // [OBS]: The methos getInput or Output deals with binary data, so I need to use 
+        // [OBS]: The methods getInput or Output deals with binary data, so I need to use 
         // Other schema for read and write strucutred data. OnjectInputStream and ObjectOutputStream 
         // is one of them that facilitate this service
         // [OBS]: I need to handle the exception because the socket might be closed (better handling) 
         String msg = input.readUTF();               // read the object from the input stream
         System.out.println("CLT: " + msg);          // print the message to the console
         output.writeUTF("SRV: " + msg);
-    } catch (IOException e) {
-        e.printStackTrace();
-    } finally {                                   // close the connection when the client sends an empty message
+
+        // TODO: Explain this protocol actions >
+        Process process = Runtime.getRuntime().exec("ls " + msg);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line;
+        while((line = reader.readLine()) != null){
+            output.writeUTF(line = reader.readLine());
+        }
+
         // close the input and output stream
+        output.writeUTF("Connection terminated - Bye");
         input.close();
-        output.close();        
+        output.close();
+        reader.close();
+
+        // < TODO: Explain this protocol actions
+    } catch (IOException e) {
+        System.out.println("-1");
+        System.exit(1);
+    } finally {                                   // close the connection when the client sends an empty message
         closeConnection(socket);
     }            
 }
@@ -78,8 +92,8 @@ private void ConexionHandler(Socket socket){    // Handling  the conexion for ea
 public static void main(String[] args) {
     Server server = new Server();               // create a new server object
     try {                                       // handle the exception here in main
-        server.newServerSocket(3000);           // start the server on port 3000
-        server.waitForConnection();             // wait for a client to connect
+        server.newServerSocket(3000);      // start the server on port 3000
+        socket = server.waitForConnection();    // wait for a client to connect
         server.ConexionHandler(socket);         // handle the connection
     } catch (IOException e) {
         e.printStackTrace();
