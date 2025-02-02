@@ -1,6 +1,6 @@
 import java.rmi.*;
 
 public interface InterfaceHourServer extends Remote {
-    // Método remoto que retorna a data e hora
+    // Remote method that returns the date and time
     public String getHour() throws RemoteException;
 }
