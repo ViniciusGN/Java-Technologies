@@ -10,26 +10,26 @@ This project is part of TP1 for the Java Technologies course, focusing on client
 ---
 
 ## Project Structure
-/Java-Technologies
-├── /src
-│    ├── /client-server   # Part I: Client-Server using TCP
-│    │   ├── Client.java
-│    │   └── Server.java
-│    ├── /rmi-server      # Part II.A: RMI Tests
-│    │   ├── InterfaceHourServer.java
-│    │   ├── ServerRMI.java      
-│    ├── /interfaces                # Part II.B: Chat Application using RMI (Star Topology)
-│    │   ├── InterfaceChatServer.java 
-│    │   ├── InterfaceChatClient.java
-│    │   └── InterfaceHourServer.java
-│    ├── /server
-│    │   ├── ChatServer.java
-│    │   ├── HourServer.java
-│    ├── /client
-│    │      └── ChatClient.java
-│    ├── /model
-│    │      └── Message.java
-└── /bin              # Compiled .class files
+/Java-Technologies <br>
+├── /src <br>
+│    ├── /client-server   # Part I: Client-Server using TCP <br>
+│    │   ├── Client.java <br>
+│    │   └── Server.java <br>
+│    ├── /rmi-server      # Part II.A: RMI Tests <br>
+│    │   ├── InterfaceHourServer.java <br>
+│    │   ├── ServerRMI.java       <br>
+│    ├── /interfaces                # Part II.B: Chat Application using RMI (Star Topology) <br>
+│    │   ├── InterfaceChatServer.java <br>
+│    │   ├── InterfaceChatClient.java <br>
+│    │   └── InterfaceHourServer.java <br>
+│    ├── /server <br>
+│    │   ├── ChatServer.java <br>
+│    │   ├── HourServer.java <br>
+│    ├── /client <br>
+│    │      └── ChatClient.java <br>
+│    ├── /model <br>
+│    │      └── Message.java <br>
+└── /bin              # Compiled .class files <br>
 
 ---
 
