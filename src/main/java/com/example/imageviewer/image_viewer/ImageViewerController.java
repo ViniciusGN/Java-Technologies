@@ -1,18 +1,17 @@
 package com.example.imageviewer.image_viewer;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.util.Duration;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-public class ImageViewerController {
+public class ImageViewerController implements PropertyChangeListener {
     @FXML
     private Button change_folder_bt, next_bt, first_bt, back_bt, last_bt;
 
@@ -28,24 +27,25 @@ public class ImageViewerController {
     @FXML
     private Label quantity_text;
 
+    private ImageViewerBean imageViewerBean;
     private List<File> imageFiles;
     private int currentIndex = 0;
     private File selectedDirectory;
 
     @FXML
     public void initialize() {
-        System.out.println("Method initialize() was called!");
+        imageViewerBean = new ImageViewerBean();
+        imageViewerBean.addPropertyChangeListener(this);
 
         time_bar.valueProperty().addListener((obs, oldValue, newValue) -> {
             System.out.println("New time for diaporama: " + newValue.intValue() + " seconds.");
-            if (diapo_box.isSelected()) {
-            }
         });
 
         String imagePath = System.getProperty("user.dir") + "/src/main/resources/com/example/imageviewer/image_viewer/images";
         File defaultDirectory = new File(imagePath);
         if (defaultDirectory.exists() && defaultDirectory.isDirectory()) {
             selectedDirectory = defaultDirectory;
+            imageViewerBean.setDirectoryName(defaultDirectory.getAbsolutePath());
             loadImages();
         } else {
             System.out.println("Image Folder not found!");
@@ -63,6 +63,7 @@ public class ImageViewerController {
             File directory = new File(directoryPath);
             if (directory.exists() && directory.isDirectory()) {
                 selectedDirectory = directory;
+                imageViewerBean.setDirectoryName(directoryPath);
                 System.out.println("New directory selected: " + directoryPath);
                 loadImages();
             } else {
@@ -81,25 +82,14 @@ public class ImageViewerController {
             return;
         }
 
-        System.out.println("Loading images from: " + selectedDirectory.getAbsolutePath());
-
         File[] files = selectedDirectory.listFiles((dir, name) -> name.toLowerCase().matches(".*\\.(png|jpg|jpeg|gif|bmp)"));
-
-        if (files != null) {
-            System.out.println("Images found: ");
-            for (File file : files) {
-                System.out.println(file.getAbsolutePath());
-            }
-        }
-
         if (files != null && files.length > 0) {
             imageFiles = Arrays.asList(files);
-            quantity_text.setText("Number of images:" + imageFiles.size());
+            imageViewerBean.setImageCount(imageFiles.size());
             currentIndex = 0;
             displayImage();
         } else {
-            System.out.println("No images found in directory!");
-            quantity_text.setText("Number of images: 0");
+            imageViewerBean.setImageCount(0);
             image_place.setImage(null);
             imageFiles = null;
         }
@@ -109,21 +99,15 @@ public class ImageViewerController {
         if (imageFiles != null && !imageFiles.isEmpty() && currentIndex >= 0 && currentIndex < imageFiles.size()) {
             File file = imageFiles.get(currentIndex);
             String imagePath = file.toURI().toString();
-            System.out.println("Displaying image in index " + currentIndex + ": " + imagePath);
 
             Image image = new Image(imagePath, false);
-            if (image.isError()) {
-                System.out.println("Error loading image: " + imagePath);
-            } else {
+            if (!image.isError()) {
                 image_place.setImage(image);
                 image_place.setPreserveRatio(true);
                 image_place.setSmooth(true);
                 image_place.setFitWidth(566);
                 image_place.setFitHeight(246);
-                System.out.println("Image loaded successfully.");
             }
-        } else {
-            System.out.println("No images to display!");
         }
     }
 
@@ -148,7 +132,7 @@ public class ImageViewerController {
         if (imageFiles != null && !imageFiles.isEmpty()) {
             if (currentIndex < imageFiles.size() - 1) {
                 currentIndex++;
-            } else if (loop_box.isSelected()) {
+            } else if (imageViewerBean.isLoopMode()) {
                 currentIndex = 0;
             }
             displayImage();
@@ -160,11 +144,17 @@ public class ImageViewerController {
         if (imageFiles != null && !imageFiles.isEmpty()) {
             if (currentIndex > 0) {
                 currentIndex--;
-            } else if (loop_box.isSelected()) {
+            } else if (imageViewerBean.isLoopMode()) {
                 currentIndex = imageFiles.size() - 1;
             }
             displayImage();
         }
     }
 
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if ("imageCount".equals(evt.getPropertyName())) {
+            quantity_text.setText("Number of images: " + evt.getNewValue());
+        }
+    }
 }
