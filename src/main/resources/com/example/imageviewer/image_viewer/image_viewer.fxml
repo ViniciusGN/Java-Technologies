@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="480.0" prefWidth="650.0"
+      xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.imageviewer.image_viewer.ImageViewerController">
+
+    <children>
+        <Button fx:id="change_folder_bt" layoutX="45.0" layoutY="20.0" mnemonicParsing="false"
+                prefHeight="25.0" prefWidth="156.0" text="Choose Folder" onAction="#chooseDirectory"/>
+
+        <Slider fx:id="time_bar" layoutX="240.0" layoutY="25.0" prefHeight="14.0" prefWidth="321.0"
+                min="1" max="10" value="5" blockIncrement="1" majorTickUnit="1" minorTickCount="0"
+                showTickLabels="true" showTickMarks="true"/>
+
+        <Separator layoutX="37.0" layoutY="65.0" prefHeight="8.0" prefWidth="551.0"/>
+
+        <StackPane layoutX="30.0" layoutY="80.0" prefWidth="566.0" prefHeight="260.0">
+            <ImageView fx:id="image_place" fitWidth="566.0" fitHeight="260.0"
+                       preserveRatio="true" smooth="true"/>
+        </StackPane>
+
+        <HBox spacing="10" layoutX="160.0" layoutY="355.0" prefWidth="400.0" alignment="CENTER">
+            <Button fx:id="first_bt" text="First" onAction="#showFirstImage" prefWidth="80.0" prefHeight="25.0"/>
+            <Button fx:id="back_bt" text="Back" onAction="#showPreviousImage" prefWidth="80.0" prefHeight="25.0"/>
+            <Button fx:id="next_bt" text="Next" onAction="#showNextImage" prefWidth="80.0" prefHeight="25.0"/>
+            <Button fx:id="last_bt" text="Last" onAction="#showLastImage" prefWidth="80.0" prefHeight="25.0"/>
+        </HBox>
+
+        <HBox spacing="10" layoutX="45.0" layoutY="400.0">
+            <CheckBox fx:id="diapo_box" text="Diaporama"/>
+            <CheckBox fx:id="loop_box" text="Loop Mode"/>
+        </HBox>
+
+        <Label fx:id="quantity_text" layoutX="450.0" layoutY="400.0" prefHeight="17.0" prefWidth="200.0"
+               text="Number of images: 0"/>
+    </children>
+</Pane>
