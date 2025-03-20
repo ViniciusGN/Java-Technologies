@@ -4,6 +4,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -12,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ImageViewerController implements PropertyChangeListener {
+
     @FXML
     private Button change_folder_bt, next_bt, first_bt, back_bt, last_bt;
 
@@ -31,6 +35,7 @@ public class ImageViewerController implements PropertyChangeListener {
     private List<File> imageFiles;
     private int currentIndex = 0;
     private File selectedDirectory;
+    private Timeline diaporama;
 
     @FXML
     public void initialize() {
@@ -45,6 +50,8 @@ public class ImageViewerController implements PropertyChangeListener {
             System.out.println("New time for diaporama: " + newValue.intValue() + " seconds.");
         });
 
+        diapo_box.selectedProperty().addListener((obs, oldValue, newValue) -> toggleDiaporama());
+
         String imagePath = System.getProperty("user.dir") + "/src/main/resources/com/example/imageviewer/image_viewer/images";
         File defaultDirectory = new File(imagePath);
         if (defaultDirectory.exists() && defaultDirectory.isDirectory()) {
@@ -54,31 +61,6 @@ public class ImageViewerController implements PropertyChangeListener {
         } else {
             System.out.println("Image Folder not found!");
         }
-    }
-
-
-    @FXML
-    public void chooseDirectory() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Choose Folder");
-        dialog.setHeaderText("Type the path for Image Folder: ");
-        dialog.setContentText("Path:");
-
-        dialog.showAndWait().ifPresent(directoryPath -> {
-            File directory = new File(directoryPath);
-            if (directory.exists() && directory.isDirectory()) {
-                selectedDirectory = directory;
-                imageViewerBean.setDirectoryName(directoryPath);
-                System.out.println("New directory selected: " + directoryPath);
-                loadImages();
-            } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("Invalid directory");
-                alert.setContentText("The path provided is not a valid directory.");
-                alert.showAndWait();
-            }
-        });
     }
 
     private void loadImages() {
@@ -138,7 +120,7 @@ public class ImageViewerController implements PropertyChangeListener {
             if (currentIndex < imageFiles.size() - 1) {
                 currentIndex++;
             } else if (imageViewerBean.isLoopMode()) {
-                currentIndex = 0; // Retorna para a primeira imagem ao ultrapassar a última
+                currentIndex = 0;
             } else {
                 return;
             }
@@ -157,6 +139,47 @@ public class ImageViewerController implements PropertyChangeListener {
                 return;
             }
             displayImage();
+        }
+    }
+    @FXML
+    public void chooseDirectory() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Choose Folder");
+        dialog.setHeaderText("Type the path for Image Folder: ");
+        dialog.setContentText("Path:");
+
+        dialog.showAndWait().ifPresent(directoryPath -> {
+            File directory = new File(directoryPath);
+            if (directory.exists() && directory.isDirectory()) {
+                selectedDirectory = directory;
+                imageViewerBean.setDirectoryName(directoryPath);
+                System.out.println("New directory selected: " + directoryPath);
+                loadImages();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Invalid directory");
+                alert.setContentText("The path provided is not a valid directory.");
+                alert.showAndWait();
+            }
+        });
+    }
+
+    @FXML
+    public void toggleDiaporama() {
+        if (diapo_box.isSelected()) {
+            int interval = (int) time_bar.getValue();
+            if (diaporama != null) {
+                diaporama.stop();
+            }
+
+            diaporama = new Timeline(new KeyFrame(Duration.seconds(interval), event -> showNextImage()));
+            diaporama.setCycleCount(loop_box.isSelected() ? Timeline.INDEFINITE : imageFiles.size());
+            diaporama.play();
+        } else {
+            if (diaporama != null) {
+                diaporama.stop();
+            }
         }
     }
 
