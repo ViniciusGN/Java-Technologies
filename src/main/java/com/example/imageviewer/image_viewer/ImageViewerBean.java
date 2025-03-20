@@ -45,6 +45,7 @@ public class ImageViewerBean {
         boolean oldLoop = this.loopMode;
         this.loopMode = loopMode;
         support.firePropertyChange("loopMode", oldLoop, loopMode);
+        System.out.println("Loop Mode is now: " + this.loopMode);
     }
 
     public boolean isSlideshowMode() {

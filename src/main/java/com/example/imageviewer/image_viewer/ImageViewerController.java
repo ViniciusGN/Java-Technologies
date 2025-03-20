@@ -37,6 +37,10 @@ public class ImageViewerController implements PropertyChangeListener {
         imageViewerBean = new ImageViewerBean();
         imageViewerBean.addPropertyChangeListener(this);
 
+        loop_box.selectedProperty().addListener((obs, oldValue, newValue) -> {
+            imageViewerBean.setLoopMode(newValue);
+        });
+
         time_bar.valueProperty().addListener((obs, oldValue, newValue) -> {
             System.out.println("New time for diaporama: " + newValue.intValue() + " seconds.");
         });
@@ -51,6 +55,7 @@ public class ImageViewerController implements PropertyChangeListener {
             System.out.println("Image Folder not found!");
         }
     }
+
 
     @FXML
     public void chooseDirectory() {
@@ -133,7 +138,9 @@ public class ImageViewerController implements PropertyChangeListener {
             if (currentIndex < imageFiles.size() - 1) {
                 currentIndex++;
             } else if (imageViewerBean.isLoopMode()) {
-                currentIndex = 0;
+                currentIndex = 0; // Retorna para a primeira imagem ao ultrapassar a última
+            } else {
+                return;
             }
             displayImage();
         }
@@ -146,6 +153,8 @@ public class ImageViewerController implements PropertyChangeListener {
                 currentIndex--;
             } else if (imageViewerBean.isLoopMode()) {
                 currentIndex = imageFiles.size() - 1;
+            } else {
+                return;
             }
             displayImage();
         }
